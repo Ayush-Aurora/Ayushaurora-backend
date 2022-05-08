@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'ayushauth.apps.AyushauthConfig'
+    'ayushauth'
 ]
 
 MIDDLEWARE = [
@@ -123,6 +123,7 @@ ROOT_URLCONF = 'ayushaura.urls'
 
 # REST framework settings
 REST_FRAMEWORK = {
+    'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated'
     ),
@@ -161,3 +162,9 @@ DATABASES = {
         'PORT': '3306'
     }
 }
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'ayushaura.030809@gmail.com'
+EMAIL_HOST_PASSWORD = 'TPT@030809'

@@ -1,13 +1,36 @@
-from secrets import choice
-import uuid
+from django.db import models
+
+# Create your models here.
+from django.contrib.auth.models import (
+    AbstractBaseUser, BaseUserManager, PermissionsMixin)
 
 from django.db import models
-from django.contrib.auth.models import PermissionsMixin
-from django.contrib.auth.base_user import AbstractBaseUser
-from django.utils import timezone
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from .managers import CustomUserManager
-# Create your models here.
+class UserManager(BaseUserManager):
+
+    def create_user(self, username, email, password=None , role=3):
+        if username is None:
+            raise TypeError('Users should have a username')
+        if email is None:
+            raise TypeError('Users should have a Email')
+
+        user = self.model(username=username, email=self.normalize_email(email))
+        user.set_password(password)
+        user.role = role
+        user.save()
+        return user
+
+    def create_superuser(self, username, email, password=None):
+        if password is None:
+            raise TypeError('Password should not be none')
+
+        user = self.create_user(username, email, password)
+        user.is_superuser = True
+        user.is_staff = True
+        user.role = 1
+        user.save()
+        return user
 
 class User(AbstractBaseUser, PermissionsMixin):
 
@@ -23,26 +46,25 @@ class User(AbstractBaseUser, PermissionsMixin):
         (PHARMACIST, 'Pharmacist')
     )
 
-    class Meta:
-        verbose_name = 'user'
-        verbose_name_plural = 'users'
-
-    uid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4, verbose_name='Public Identifier')
-    email = models.EmailField(unique=True)
-    name = models.CharField(max_length=50, blank=True)
+    username = models.CharField(max_length=255, unique=True, db_index=True)
+    email = models.EmailField(max_length=255, unique=True, db_index=True)
     role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True, default=3)
+    is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    is_deleted = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-    created_date = models.DateTimeField(default=timezone.now)
-    modified_date = models.DateTimeField(default=timezone.now)
-    created_by = models.EmailField()
-    modified_by = models.EmailField()
-
-    objects = CustomUserManager()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    # auth_provider = models.CharField(
+    #     max_length=255, blank=False,
+    #     null=False, default=AUTH_PROVIDERS.get('email'))
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ['username' , 'role']
+
+    objects = UserManager()
 
     def __str__(self):
         return self.email
+
+    def tokens(self):
+        return ''
