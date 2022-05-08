@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'ayushauth.apps.AyushauthConfig'
+    'ayushauth.apps.AyushauthConfig',
+    'rest_framework.authtoken'
 ]
 
 MIDDLEWARE = [
@@ -124,15 +125,16 @@ ROOT_URLCONF = 'ayushaura.urls'
 # REST framework settings
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated'
+        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAdminUser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication'
     ),
 }
 
+REST_USE_JWT = True
 SECRET_KEY = "ayushwx048dwaf_(7g%@we6nl0s!=#08304uq3oevz_1c3i$1qyxd9@aura"
 
 # Configure the JWT settings
@@ -153,11 +155,7 @@ SIMPLE_JWT = {
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'user_meta_data',
-        'USER': 'admin',
-        'PASSWORD': 'db-TPT030809',
-        'HOST': '127.0.0.1',
-        'PORT': '3306'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }

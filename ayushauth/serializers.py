@@ -1,10 +1,10 @@
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import update_last_login
-
+from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
+from .models import User,Prescriptions
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -16,8 +16,13 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         )
 
     def create_user(self , validated_data):
-        auth_user = User.objects.create_user(**validated_data)
+        auth_user = User(validated_data['email'])
+        auth_user.set_password(validated_data['password'])
+        auth_user.save()
         return auth_user
+
+
+
 
 class UserLoginSerializer(serializers.ModelSerializer):
     class Meta:
@@ -44,6 +49,7 @@ class UserLoginSerializer(serializers.ModelSerializer):
     def validate(self , data):
         email = data['email']
         password = data['password']
+        print(password)
         user = authenticate(email=email , password=password)
         print(user)
         if user is None:
@@ -75,3 +81,43 @@ class UserListSerializer(serializers.ModelSerializer):
             'email',
             'role'
         )
+
+
+class PrescriptionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Prescriptions
+        fields = (
+            'patientid',
+            'doctorid',
+            'medid',
+            'created'
+        )
+    
+    def validate(self, data):
+        patientdata = User.objects.filter(uid=data['patientid'])
+        doctordata = User.objects.filter(uid=data['doctorid'])
+
+        if(patientdata.role != 2 and doctordata.role != 3):
+            raise serializers.ValidationError("Invalid request")
+        
+        
+        
+
+'''
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email')
+
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'email', 'password')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User(validated_data['username'], validated_data['email'])
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+'''

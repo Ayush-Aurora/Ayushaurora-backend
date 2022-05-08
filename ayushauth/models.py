@@ -46,3 +46,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+class Prescriptions(models.Model):
+    pid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4, verbose_name='Public Identifier')
+    patientid = models.ForeignKey(User,on_delete=models.CASCADE,related_name='patientid')
+    doctorid = models.ForeignKey(User,on_delete=models.CASCADE,related_name='doctorid')
+    medid = models.IntegerField(default=1)
+    created = models.DateTimeField(default=timezone.now())
+
+    class Meta:
+        ordering = ["-created"]
+
+    def __str__(self):
+        return f'{self.patientid} by {self.doctorid} - {self.medid} on {self.created}'
+
+    

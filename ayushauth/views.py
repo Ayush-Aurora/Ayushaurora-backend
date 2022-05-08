@@ -3,14 +3,18 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.generics import DestroyAPIView
+from rest_framework.generics import UpdateAPIView
 from .serializers import (
     UserRegistrationSerializer,
     UserLoginSerializer,
-    UserListSerializer
+    UserListSerializer,
+    PrescriptionSerializer
 )
 
-from .models import User
+from .models import User,Prescriptions
 
 
 class UserRegistrationView(APIView):
@@ -39,6 +43,7 @@ class UserLoginView(APIView):
     permission_classes = (AllowAny, )
 
     def post(self, request):
+        print(request.data)
         serializer = self.serializer_class(data=request.data)
         valid = serializer.is_valid(raise_exception=True)
         if valid:
@@ -82,3 +87,51 @@ class UserListView(APIView):
 
             }
             return Response(response, status=status.HTTP_200_OK)
+
+
+
+# Create your views here.
+class ListPrescriptionsAPIView(ListAPIView):
+    """This endpoint list all of the available todos from the database"""
+    queryset = Prescriptions.objects.all()
+    serializer_class = PrescriptionSerializer
+    permission_classes = (IsAuthenticated,)
+
+class CreatePrescriptionsAPIView(CreateAPIView):
+    serializer_class = PrescriptionSerializer
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request):
+        print(request.data)
+        serializer = self.serializer_class(data=request.data)
+        
+        
+
+        if valid:
+            status_code = status.HTTP_200_OK
+
+            response = {
+                'success': True,
+                'statusCode': status_code,
+                'message': 'User logged in successfully',
+                'access': serializer.data['access'],
+                'refresh': serializer.data['refresh'],
+                'authenticatedUser': {
+                    'email': serializer.data['email'],
+                    'role': serializer.data['role']
+                }
+            }
+
+            return Response(response, status=status_code)
+
+class UpdatePrescriptionsAPIView(UpdateAPIView):
+    """This endpoint allows for updating a specific Prescriptions by passing in the id of the Prescriptions to update"""
+    queryset = Prescriptions.objects.all()
+    serializer_class = PrescriptionSerializer
+    permission_classes = (IsAuthenticated,)
+
+class DeletePrescriptionsAPIView(DestroyAPIView):
+    """This endpoint allows for deletion of a specific Prescriptions from the database"""
+    queryset = Prescriptions.objects.all()
+    serializer_class = PrescriptionSerializer
+    permission_classes = (IsAuthenticated,)
