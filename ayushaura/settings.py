@@ -38,7 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'ayushauth'
+    'ayushauth',
+    'prescriptions',
+    'medicines'
 ]
 
 MIDDLEWARE = [
@@ -155,13 +157,31 @@ SIMPLE_JWT = {
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'user_meta_data',
+        'NAME': 'app_meta_data',
+        'USER': 'admin',
+        'PASSWORD': 'db-TPT030809',
+        'HOST': '127.0.0.1',
+        'PORT': '3306'
+    },
+    'medicines_data': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'master_medicine',
+        'USER': 'admin',
+        'PASSWORD': 'db-TPT030809',
+        'HOST': '127.0.0.1',
+        'PORT': '3306'
+    },
+    'doctors_db': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'doctors_db',
         'USER': 'admin',
         'PASSWORD': 'db-TPT030809',
         'HOST': '127.0.0.1',
         'PORT': '3306'
     }
 }
+
+DATABSE_ROUTERS = ['routers.db_routers.DoctorRouter' , 'routers.db_routers.MedicineRouter']
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
